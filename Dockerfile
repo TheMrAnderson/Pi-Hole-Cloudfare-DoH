@@ -1,4 +1,4 @@
-FROM pihole/pihole:master-buster:latest-amd64
+FROM pihole/pihole:master-buster
 
 # install basic packages
 RUN apt-get update && apt-get install -y \
