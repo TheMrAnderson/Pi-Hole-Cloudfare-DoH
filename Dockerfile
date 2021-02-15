@@ -18,9 +18,4 @@ RUN cd /tmp \
 	&& useradd -s /usr/sbin/nologin -r -M cloudflared \
 	&& chown cloudflared:cloudflared /usr/local/bin/cloudflared \
 	&& mkdir -p /etc/cloudflared \
-	&& rm -f /etc/cloudflared/config.yml \
-	&& apt-get -y autoremove \
-	&& apt-get -y autoclean \
-	&& apt-get -y clean \
-	&& rm -fr /tmp/* /var/tmp/* /var/lib/apt/lists/* \
-	&& mv /tmp /cloudfared
+	&& rm -f /etc/cloudflared/config.yml
