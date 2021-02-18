@@ -5,7 +5,8 @@ RUN apt-get update && apt-get install -y \
 	apt-utils \
 	stubby \
 	&& mkdir -p /etc/stubby \
-	&& rm -f /etc/stubby/stubby.yml
+	&& rm -f /etc/stubby/stubby.yml \
+	&& rm -rf /var/lib/apt/lists/*
 
 # add cloudflared config
 COPY ./cloudfared cloudfared
