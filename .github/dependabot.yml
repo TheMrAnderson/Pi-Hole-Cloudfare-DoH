@@ -1,4 +1,4 @@
-version: 2
+version: 1
 updates:
   # Enable version updates for Docker
   - package-ecosystem: "docker"
