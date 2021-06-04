@@ -4,6 +4,7 @@ FROM pihole/pihole:master-buster
 RUN apt-get update && apt-get install -y \
 	apt-utils \
 	stubby \
+	wget \
 	&& mkdir -p /etc/stubby \
 	&& rm -f /etc/stubby/stubby.yml \
 	&& rm -rf /var/lib/apt/lists/*
