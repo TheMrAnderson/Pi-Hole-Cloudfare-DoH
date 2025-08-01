@@ -19,7 +19,7 @@ RUN useradd -r -s /bin/false cloudflared
 RUN mkdir -p /etc/cloudflared
 
 # Copy config and startup script
-COPY cloudfared/config.yml /etc/cloudflared/config.yml
+COPY cloudfared.yml /etc/cloudflared/config.yml
 COPY start.sh /start.sh
 RUN chmod +x /start.sh
 
