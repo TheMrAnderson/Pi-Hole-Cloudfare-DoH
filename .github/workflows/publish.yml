@@ -117,7 +117,7 @@ jobs:
 
       - name: Open scheduled failure issue
         if: failure() && github.event_name == 'schedule'
-        uses: actions/github-script@v7
+        uses: actions/github-script@v8
         with:
           script: |
             const title = "Scheduled Docker publish failed";
@@ -151,7 +151,7 @@ jobs:
 
       - name: Close scheduled failure issue on recovery
         if: success() && github.event_name == 'schedule'
-        uses: actions/github-script@v7
+        uses: actions/github-script@v8
         with:
           script: |
             const title = "Scheduled Docker publish failed";
