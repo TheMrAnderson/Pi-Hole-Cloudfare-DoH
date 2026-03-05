@@ -61,7 +61,7 @@ jobs:
 
       - name: Verify admin UI and DNS
         run: |
-          timeout_seconds=240
+          timeout_seconds=300
           start_time="$(date +%s)"
           while true; do
             if [ "$(docker inspect -f '{{.State.Running}}' pihole-test 2>/dev/null)" != "true" ]; then
@@ -69,19 +69,23 @@ jobs:
               docker logs pihole-test || true
               exit 1
             fi
-            if curl -fsS --retry 3 --retry-all-errors --retry-delay 1 http://127.0.0.1:8080/admin/login >/dev/null; then
+            health_status="$(docker inspect -f '{{if .State.Health}}{{.State.Health.Status}}{{else}}none{{end}}' pihole-test)"
+            if [ "${health_status}" = "healthy" ]; then
               break
             fi
             now="$(date +%s)"
             if [ $((now - start_time)) -ge "${timeout_seconds}" ]; then
-              echo "Timed out waiting for Pi-hole admin UI"
+              echo "Timed out waiting for healthy container (last health: ${health_status})"
               docker logs pihole-test || true
               exit 1
             fi
             sleep 2
           done
+
+          curl -fsS --retry 10 --retry-all-errors --retry-delay 2 http://127.0.0.1:8080/admin/login >/dev/null 2>&1
+          docker exec pihole-test curl -fsS --retry 10 --retry-all-errors --retry-delay 2 http://127.0.0.1/admin/login >/dev/null 2>&1
           docker exec pihole-test pgrep cloudflared >/dev/null
-          docker exec pihole-test bash -lc "dig +short @127.0.0.1 -p 53 cloudflare.com | grep -E '^[0-9.]+'"
+          docker exec pihole-test bash -lc "for i in $(seq 1 10); do dig +short @127.0.0.1 -p 53 cloudflare.com | grep -E '^[0-9.]+' && exit 0; sleep 2; done; exit 1"
 
       - name: Push image tags
         uses: docker/build-push-action@v6
