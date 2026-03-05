@@ -8,4 +8,27 @@ DNS_UPSTREAM: Comma separated list of upstream DNS servers to use.  The DNS Sett
 
 [Docker Hub](https://hub.docker.com/r/themranderson/pi-hole-cloudfare-doh)
 
-There is a Dependabot config to ensure as the PiHole base image is updated, this is as well to ensure this stays up to date with their security updates.
+## Update Automation
+
+This repo now uses GitHub Actions (not Docker Hub autobuild) as the source of truth for updates:
+
+1. `Dockerfile` pins `pihole/pihole` to a versioned tag (currently `2026.02.0`).
+2. Dependabot opens PRs when that base image tag changes.
+3. CI workflow builds and smoke-tests every PR.
+4. Publish workflow runs on every push to `master`.
+5. Publish workflow runs every day (`cron`).
+6. Publish workflow supports manual `workflow_dispatch`.
+7. Publish smoke-tests before pushing Docker Hub tags.
+8. Pushed tags include `latest`.
+9. Pushed tags include `stable`.
+10. Pushed tags include `pihole-<base-tag>`.
+11. Pushed tags include `sha-<commit>`.
+
+## Notifications
+
+If the scheduled publish run fails, GitHub Actions opens (or updates) an issue titled `Scheduled Docker publish failed`. The issue is auto-closed after the next successful scheduled run.
+
+To receive alerts without hunting:
+
+1. Watch this repo with `Custom` notifications enabled for `Actions` and `Issues`.
+2. Optionally enable email notifications for failed GitHub Actions workflow runs in your GitHub notification settings.

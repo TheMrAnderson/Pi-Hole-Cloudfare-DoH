@@ -6,8 +6,8 @@ RUN apt-get update && \
 	curl -L https://github.com/cloudflare/cloudflared/releases/latest/download/cloudflared-linux-amd64 -o /cloudflared && \
 	chmod +x /cloudflared
 
-# Stage 2: Use Pi-hole base image
-FROM pihole/pihole:latest
+# Stage 2: Use a pinned Pi-hole base image so Dependabot can track updates.
+FROM pihole/pihole:2026.02.0
 
 # Copy cloudflared into Pi-hole image
 COPY --from=cloudflared-builder /cloudflared /usr/local/bin/cloudflared
