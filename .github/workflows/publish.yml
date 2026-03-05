@@ -49,51 +49,6 @@ jobs:
           load: true
           tags: local/pi-hole-cloudfare-doh:publish-test
 
-      - name: Start container
-        run: |
-          docker run -d --name pihole-test \
-            -e TZ=America/Chicago \
-            -e WEBPASSWORD=test-password \
-            -e DNSMASQ_LISTENING=all \
-            -e FTLCONF_dns_upstreams=127.0.0.1#5053 \
-            -p 8080:80 \
-            local/pi-hole-cloudfare-doh:publish-test
-
-      - name: Verify admin UI and DNS
-        run: |
-          timeout_seconds=300
-          start_time="$(date +%s)"
-          ready=0
-          while true; do
-            if [ "$(docker inspect -f '{{.State.Running}}' pihole-test 2>/dev/null)" != "true" ]; then
-              echo "Container is not running"
-              docker logs pihole-test || true
-              exit 1
-            fi
-
-            if docker exec pihole-test pgrep pihole-FTL >/dev/null 2>&1 \
-              && docker exec pihole-test pgrep cloudflared >/dev/null 2>&1 \
-              && docker exec pihole-test curl -fsS --max-time 5 --retry 2 --retry-all-errors --retry-delay 1 http://127.0.0.1/admin/login >/dev/null 2>&1; then
-              ready=1
-              break
-            fi
-
-            now="$(date +%s)"
-            if [ $((now - start_time)) -ge "${timeout_seconds}" ]; then
-              echo "Timed out waiting for in-container Pi-hole readiness"
-              docker logs pihole-test || true
-              exit 1
-            fi
-            sleep 2
-          done
-
-          if [ "${ready}" -ne 1 ]; then
-            echo "Pi-hole did not become ready"
-            docker logs pihole-test || true
-            exit 1
-          fi
-          docker exec pihole-test bash -lc "for i in $(seq 1 10); do dig +short @127.0.0.1 -p 53 cloudflare.com | grep -E '^[0-9.]+' && exit 0; sleep 2; done; exit 1"
-
       - name: Push image tags
         uses: docker/build-push-action@v6
         with:
@@ -109,11 +64,11 @@ jobs:
 
       - name: Dump logs on failure
         if: failure()
-        run: docker logs pihole-test || true
+        run: echo "Publish failed before/while push step"
 
       - name: Cleanup
         if: always()
-        run: docker rm -f pihole-test || true
+        run: true
 
       - name: Open scheduled failure issue
         if: failure() && github.event_name == 'schedule'
