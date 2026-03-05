@@ -29,4 +29,4 @@ EXPOSE 5053/udp
 CMD ["/start.sh"]
 
 HEALTHCHECK --interval=30s --timeout=10s --start-period=10s \
-	CMD curl -sSf http://localhost/admin/index.php || exit 1
+	CMD pgrep pihole-FTL >/dev/null || exit 1

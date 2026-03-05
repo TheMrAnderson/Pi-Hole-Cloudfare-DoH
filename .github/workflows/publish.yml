@@ -63,28 +63,35 @@ jobs:
         run: |
           timeout_seconds=300
           start_time="$(date +%s)"
+          ready=0
           while true; do
             if [ "$(docker inspect -f '{{.State.Running}}' pihole-test 2>/dev/null)" != "true" ]; then
               echo "Container is not running"
               docker logs pihole-test || true
               exit 1
             fi
-            health_status="$(docker inspect -f '{{if .State.Health}}{{.State.Health.Status}}{{else}}none{{end}}' pihole-test)"
-            if [ "${health_status}" = "healthy" ]; then
+
+            if docker exec pihole-test pgrep pihole-FTL >/dev/null 2>&1 \
+              && docker exec pihole-test pgrep cloudflared >/dev/null 2>&1 \
+              && docker exec pihole-test curl -fsS --max-time 5 --retry 2 --retry-all-errors --retry-delay 1 http://127.0.0.1/admin/login >/dev/null 2>&1; then
+              ready=1
               break
             fi
+
             now="$(date +%s)"
             if [ $((now - start_time)) -ge "${timeout_seconds}" ]; then
-              echo "Timed out waiting for healthy container (last health: ${health_status})"
+              echo "Timed out waiting for in-container Pi-hole readiness"
               docker logs pihole-test || true
               exit 1
             fi
             sleep 2
           done
 
-          curl -fsS --retry 10 --retry-all-errors --retry-delay 2 http://127.0.0.1:8080/admin/login >/dev/null 2>&1
-          docker exec pihole-test curl -fsS --retry 10 --retry-all-errors --retry-delay 2 http://127.0.0.1/admin/login >/dev/null 2>&1
-          docker exec pihole-test pgrep cloudflared >/dev/null
+          if [ "${ready}" -ne 1 ]; then
+            echo "Pi-hole did not become ready"
+            docker logs pihole-test || true
+            exit 1
+          fi
           docker exec pihole-test bash -lc "for i in $(seq 1 10); do dig +short @127.0.0.1 -p 53 cloudflare.com | grep -E '^[0-9.]+' && exit 0; sleep 2; done; exit 1"
 
       - name: Push image tags
