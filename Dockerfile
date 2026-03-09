@@ -6,8 +6,14 @@ RUN apt-get update && \
 	curl -L https://github.com/cloudflare/cloudflared/releases/latest/download/cloudflared-linux-amd64 -o /cloudflared && \
 	chmod +x /cloudflared
 
+ARG PIHOLE_BASE_TAG=2026.02.0
+ARG PIHOLE_BASE_IMAGE_ID=
+
 # Stage 2: Use a pinned Pi-hole base image so Dependabot can track updates.
-FROM pihole/pihole:2026.02.0
+FROM pihole/pihole:${PIHOLE_BASE_TAG}
+
+LABEL org.opencontainers.image.base.tag="${PIHOLE_BASE_TAG}" \
+	org.opencontainers.image.base.image.id="${PIHOLE_BASE_IMAGE_ID}"
 
 # Copy cloudflared into Pi-hole image
 COPY --from=cloudflared-builder /cloudflared /usr/local/bin/cloudflared

@@ -16,9 +16,9 @@ This repo now uses GitHub Actions (not Docker Hub autobuild) as the source of tr
 2. Dependabot opens PRs when that base image tag changes.
 3. CI workflow builds and smoke-tests every PR.
 4. Publish workflow runs on every push to `master`.
-5. Publish workflow runs every day (`cron`).
+5. Publish workflow runs daily (`cron`) and skips builds unless the Pi-hole base image changed.
 6. Publish workflow supports manual `workflow_dispatch`.
-7. Publish smoke-tests before pushing Docker Hub tags.
+7. Publish workflow pushes Docker Hub tags.
 8. Pushed tags include `latest`.
 9. Pushed tags include `stable`.
 10. Pushed tags include `pihole-<base-tag>`.
