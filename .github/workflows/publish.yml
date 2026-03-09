@@ -43,14 +43,14 @@ jobs:
           password: ${{ secrets.DOCKERHUB_TOKEN }}
 
       - name: Build image for smoke test
-        uses: docker/build-push-action@v6
+        uses: docker/build-push-action@v7
         with:
           pull: true
           load: true
           tags: local/pi-hole-cloudfare-doh:publish-test
 
       - name: Push image tags
-        uses: docker/build-push-action@v6
+        uses: docker/build-push-action@v7
         with:
           pull: true
           push: true
