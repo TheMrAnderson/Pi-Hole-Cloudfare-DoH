@@ -29,7 +29,11 @@ jobs:
       - name: Read Pi-hole base tag
         id: base
         run: |
-          PIHOLE_TAG="$(grep -Eo 'pihole/pihole:[^[:space:]]+' Dockerfile | head -n1 | cut -d: -f2)"
+          PIHOLE_TAG="$(grep -E '^ARG PIHOLE_BASE_TAG=' Dockerfile | head -n1 | cut -d= -f2)"
+          if [ -z "${PIHOLE_TAG}" ]; then
+            echo "Unable to determine Pi-hole base tag from Dockerfile" >&2
+            exit 1
+          fi
           docker pull --quiet "pihole/pihole:${PIHOLE_TAG}" >/dev/null
           PIHOLE_IMAGE_ID="$(docker image inspect --format '{{.Id}}' "pihole/pihole:${PIHOLE_TAG}")"
           echo "pihole_tag=${PIHOLE_TAG}" >> "${GITHUB_OUTPUT}"
