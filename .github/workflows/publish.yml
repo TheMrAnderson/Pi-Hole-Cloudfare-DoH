@@ -84,6 +84,9 @@ jobs:
         with:
           pull: true
           push: true
+          build-args: |
+            PIHOLE_BASE_TAG=${{ steps.base.outputs.pihole_tag }}
+            PIHOLE_BASE_IMAGE_ID=${{ steps.base.outputs.pihole_image_id }}
           tags: |
             ${{ env.IMAGE_NAME }}:latest
             ${{ env.IMAGE_NAME }}:stable
