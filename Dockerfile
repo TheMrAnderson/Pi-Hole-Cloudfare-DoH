@@ -1,3 +1,6 @@
+ARG PIHOLE_BASE_TAG=2026.02.0
+ARG PIHOLE_BASE_IMAGE_ID=
+
 # Stage 1: Download cloudflared binary
 FROM debian:bullseye AS cloudflared-builder
 
@@ -6,11 +9,11 @@ RUN apt-get update && \
 	curl -L https://github.com/cloudflare/cloudflared/releases/latest/download/cloudflared-linux-amd64 -o /cloudflared && \
 	chmod +x /cloudflared
 
-ARG PIHOLE_BASE_TAG=2026.02.0
-ARG PIHOLE_BASE_IMAGE_ID=
-
 # Stage 2: Use a pinned Pi-hole base image so Dependabot can track updates.
 FROM pihole/pihole:${PIHOLE_BASE_TAG}
+
+ARG PIHOLE_BASE_TAG
+ARG PIHOLE_BASE_IMAGE_ID
 
 LABEL org.opencontainers.image.base.tag="${PIHOLE_BASE_TAG}" \
 	org.opencontainers.image.base.image.id="${PIHOLE_BASE_IMAGE_ID}"
