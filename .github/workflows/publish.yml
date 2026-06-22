@@ -94,8 +94,7 @@ jobs:
         run: echo "Publish failed before/while push step"
 
       - name: Cleanup
-        if: always()
-        if: steps.base.outputs.skip_build != 'true'
+        if: always() && steps.base.outputs.skip_build != 'true'
         run: true
 
       - name: Open scheduled failure issue
