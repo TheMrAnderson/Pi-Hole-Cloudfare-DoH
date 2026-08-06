@@ -43,7 +43,7 @@ jobs:
           if [ "${{ github.event_name }}" = "schedule" ]; then
             docker pull --quiet "${IMAGE_NAME}:latest" >/dev/null 2>&1 || true
             if docker image inspect "${IMAGE_NAME}:latest" >/dev/null 2>&1; then
-              PREVIOUS_PUB_ID="$(docker inspect --format='{{index .Config.Labels \"org.opencontainers.image.base.image.id\"}}' "${IMAGE_NAME}:latest")"
+              PREVIOUS_PUB_ID="$(docker inspect --format='{{index .Config.Labels "org.opencontainers.image.base.image.id"}}' "${IMAGE_NAME}:latest")"
               echo "previous_base_image_id=${PREVIOUS_PUB_ID}" >> "${GITHUB_OUTPUT}"
               if [ "${PIHOLE_IMAGE_ID}" = "${PREVIOUS_PUB_ID}" ]; then
                 SKIP_BUILD="true"
