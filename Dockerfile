@@ -10,15 +10,13 @@ ARG PIHOLE_BASE_IMAGE_ID
 LABEL org.opencontainers.image.base.tag="${PIHOLE_BASE_TAG}" \
 	org.opencontainers.image.base.image.id="${PIHOLE_BASE_IMAGE_ID}"
 
-# Download cloudflared into the Pi-hole image.
-RUN apt-get update && \
-	apt-get install -y --no-install-recommends curl ca-certificates && \
+# Download cloudflared into the Alpine-based Pi-hole image.
+RUN apk add --no-cache curl ca-certificates && \
 	curl -L https://github.com/cloudflare/cloudflared/releases/latest/download/cloudflared-linux-amd64 -o /usr/local/bin/cloudflared && \
-	chmod +x /usr/local/bin/cloudflared && \
-	rm -rf /var/lib/apt/lists/*
+	chmod +x /usr/local/bin/cloudflared
 
 # Create a user (optional security step)
-RUN useradd -r -s /bin/false cloudflared
+RUN adduser -S -D -H -s /sbin/nologin cloudflared
 
 # Create directory for cloudflared config
 RUN mkdir -p /etc/cloudflared
