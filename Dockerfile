@@ -1,7 +1,7 @@
 # Keep the Pi-hole image directly in the FROM instruction so Dependabot can
 # discover and update this dependency. Docker image references supplied via
 # ARG are not updated by Dependabot.
-FROM pihole/pihole:2026.09.0
+FROM pihole/pihole:2026.10.0
 
 # These values are supplied by the publish workflow for image provenance.
 ARG PIHOLE_BASE_TAG=2026.09.0
